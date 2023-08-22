@@ -28,7 +28,7 @@ class StreammultiUser extends StatelessWidget {
             return CircularProgressIndicator.adaptive();
           }
 
-          List<Student> users=snapshot.data!.docs.map((e) => Student.formMap(e.data() as Map<String,dynamic>)).toList();
+          List<Student> users=snapshot.data!.docs.map((e) => Student.fromMap(e.data() as Map<String,dynamic>)).toList();
 
           return ListView.builder(
             itemCount: users.length,

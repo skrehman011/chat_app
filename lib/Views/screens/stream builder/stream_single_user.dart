@@ -48,7 +48,7 @@ class StreamSingleUser extends StatelessWidget {
                   }
 
                   var data = snapshot.data!.data() as Map<String, dynamic>;
-                  var user = Student.formMap(data);
+                  var user = Student.fromMap(data);
 
                   return ListTile(
                       title: Text(' ${user.name},  ${user.age}'),

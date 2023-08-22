@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:mondaytest/Models/message_model.dart';
+import 'package:mondaytest/controller/chat_controller.dart';
 import 'package:mondaytest/helper/Fcm.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -13,17 +14,24 @@ import '../../helper/constants.dart';
 
 class ScreenChat extends StatelessWidget {
   Student receiver;
-  RegistrationController chatController = Get.put(RegistrationController());
 
   @override
   Widget build(BuildContext context) {
+    ChatController chatController = Get.put(ChatController(receiver_id: receiver.id));
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text(
-          receiver.name,
-          style: TextStyle(color: Colors.black),
+        title: ListTile(
+          title: Text(
+            receiver.name,
+            style: TextStyle(color: Colors.black, fontSize: 18.sp, fontWeight: FontWeight.bold),
+          ),
+          subtitle: Obx(() {
+            return Text(formatRelativeTime(chatController.receiverObservable.value?.lastSeen ?? 0));
+          }),
         ),
+        centerTitle: false,
         leading: IconButton(
           onPressed: () {
             Get.back();
@@ -162,18 +170,16 @@ class ScreenChat extends StatelessWidget {
                         var timestamp = DateTime.now().millisecondsSinceEpoch;
 
                         var message = MessageModel(
-                          id: timestamp.toString(),
-                          text: chatController.textEditingController.text,
-                          sender_id: currentUser!.uid,
-                          timestamp: timestamp,
-                          receiver_id: receiver.id
-                        );
+                            id: timestamp.toString(),
+                            text: chatController.textEditingController.text,
+                            sender_id: currentUser!.uid,
+                            timestamp: timestamp,
+                            receiver_id: receiver.id);
 
                         var roomPath = chatsRef.child(getRoomId(receiver.id, currentUser!.uid));
 
                         usersRef.doc(currentUser!.uid).collection('inbox').doc(receiver.id).set(message.toMap());
                         usersRef.doc(receiver.id).collection('inbox').doc(currentUser!.uid).set(message.toMap());
-
 
                         roomPath.child("messages").child(timestamp.toString()).set(message.toMap());
                         chatController.textEditingController.clear();
@@ -253,4 +259,30 @@ class ScreenChat extends StatelessWidget {
   ScreenChat({
     required this.receiver,
   });
+
+  String formatRelativeTime(int millisecondsSinceEpoch) {
+    final now = DateTime.now();
+    final timestamp = DateTime.fromMillisecondsSinceEpoch(millisecondsSinceEpoch);
+    final difference = now.difference(timestamp);
+
+    if (difference.inSeconds <= 10) {
+      return "Online";
+    }
+
+    if (difference.inSeconds < 60) {
+      return '${difference.inSeconds} sec ago';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} min ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} hours ago';
+    } else if (difference.inDays < 30) {
+      return '${difference.inDays} days ago';
+    } else if (difference.inDays < 365) {
+      final months = (difference.inDays / 30).floor();
+      return '$months months ago';
+    } else {
+      final years = (difference.inDays / 365).floor();
+      return '$years years ago';
+    }
+  }
 }

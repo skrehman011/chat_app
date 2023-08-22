@@ -2,16 +2,7 @@ class Student {
   String id, email, password, name;
   int age;
   String? token;
-
-  factory Student.formMap(Map<String, dynamic> data){
-    return Student(
-      id: data['id'] as String,
-      email:data ['email'] as String,
-      password:data ['password'] as String,
-      name:data ['name'] as String,
-      age: data['age'] as int,
-    );
-  }
+  int lastSeen;
 
 //<editor-fold desc="Data Methods">
   Student({
@@ -21,6 +12,7 @@ class Student {
     required this.name,
     required this.age,
     this.token,
+    required this.lastSeen,
   });
 
   @override
@@ -33,14 +25,23 @@ class Student {
           password == other.password &&
           name == other.name &&
           age == other.age &&
-          token == other.token);
+          token == other.token &&
+          lastSeen == other.lastSeen);
 
   @override
-  int get hashCode => id.hashCode ^ email.hashCode ^ password.hashCode ^ name.hashCode ^ age.hashCode ^ token.hashCode;
+  int get hashCode => id.hashCode ^ email.hashCode ^ password.hashCode ^ name.hashCode ^ age.hashCode ^ token.hashCode ^ lastSeen.hashCode;
 
   @override
   String toString() {
-    return 'Student{' + ' id: $id,' + ' email: $email,' + ' password: $password,' + ' name: $name,' + ' age: $age,' + ' token: $token,' + '}';
+    return 'Student{' +
+        ' id: $id,' +
+        ' email: $email,' +
+        ' password: $password,' +
+        ' name: $name,' +
+        ' age: $age,' +
+        ' token: $token,' +
+        ' lastSeen: $lastSeen,' +
+        '}';
   }
 
   Student copyWith({
@@ -50,6 +51,7 @@ class Student {
     String? name,
     int? age,
     String? token,
+    int? lastSeen,
   }) {
     return Student(
       id: id ?? this.id,
@@ -58,6 +60,7 @@ class Student {
       name: name ?? this.name,
       age: age ?? this.age,
       token: token ?? this.token,
+      lastSeen: lastSeen ?? this.lastSeen,
     );
   }
 
@@ -69,6 +72,7 @@ class Student {
       'name': this.name,
       'age': this.age,
       'token': this.token,
+      'lastSeen': this.lastSeen,
     };
   }
 
@@ -80,6 +84,7 @@ class Student {
       name: map['name'] as String,
       age: map['age'] as int,
       token: map['token'] as String? ?? "",
+      lastSeen: map['lastSeen'] as int? ?? 0,
     );
   }
 

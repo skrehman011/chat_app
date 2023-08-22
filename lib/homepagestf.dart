@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     updateMyToken();
+    startLastSeenUpdates();
     super.initState();
   }
 
@@ -115,6 +118,14 @@ class _HomePageState extends State<HomePage> {
     var token = await FCM.generateToken();
     usersRef.doc(currentUser!.uid).update({
       "token": token
+    });
+  }
+
+  void startLastSeenUpdates() {
+    Timer.periodic(Duration(seconds: 10), (timer) {
+      usersRef.doc(currentUser!.uid).update({
+        'lastSeen': DateTime.now().millisecondsSinceEpoch
+      });
     });
   }
 }

@@ -39,6 +39,7 @@ class RegistrationController extends GetxController {
           password: password,
           name: name,
           age: int.tryParse(age) ?? 0,
+          lastSeen: DateTime.now().millisecondsSinceEpoch
         );
 
         currentUser!.updateDisplayName(name);
@@ -96,23 +97,5 @@ class RegistrationController extends GetxController {
     }
   }
 
-  var isEmojiVisible = false.obs;
-  FocusNode focusNode = FocusNode();
-  var textEditingController = TextEditingController();
 
-  @override
-  void onInit() {
-    super.onInit();
-    focusNode.addListener(() {
-      if (focusNode.hasFocus) {
-        isEmojiVisible.value = false;
-      }
-    });
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-    textEditingController.dispose();
-  }
 }
