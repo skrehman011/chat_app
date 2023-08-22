@@ -41,6 +41,8 @@ class RegistrationController extends GetxController {
           age: int.tryParse(age) ?? 0,
         );
 
+        currentUser!.updateDisplayName(name);
+
         FirebaseFirestore.instance
             .collection('users')
             .doc(user.id)
@@ -77,10 +79,15 @@ class RegistrationController extends GetxController {
     } else {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password)
-          .then((value) {
+          .then((value) async {
         Get.snackbar('Success', 'Login SuccessFully');
         emailcontroller.clear();
         passwordController.clear();
+
+        var myDoc = await usersRef.doc(currentUser!.uid).get();
+        var obj = Student.fromMap(myDoc.data()!);
+        currentUser!.updateDisplayName(obj.name);
+
         Get.offAll(HomePage());
         print(value.user!.email.toString());
       }).catchError((error) {

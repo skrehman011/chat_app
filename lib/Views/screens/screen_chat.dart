@@ -153,7 +153,7 @@ class ScreenChat extends StatelessWidget {
                     onPressed: () async {
                       if (chatController.textEditingController.text.isNotEmpty) {
                         FCM.sendMessageSingle(
-                          "New message",
+                          currentUser!.displayName ?? "New Message",
                           chatController.textEditingController.text,
                           receiver.token ?? "",
                           {},

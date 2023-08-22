@@ -7,12 +7,26 @@ import 'package:mondaytest/Models/user_model.dart';
 import 'package:mondaytest/Views/screens/screen_all_users.dart';
 import 'package:mondaytest/Views/screens/screen_chat.dart';
 import 'package:mondaytest/Views/screens/screen_log_in.dart';
+import 'package:mondaytest/helper/Fcm.dart';
 import 'package:mondaytest/helper/constants.dart';
 
 import 'Models/Student.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+  @override
+  void initState() {
+    updateMyToken();
+    super.initState();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -95,5 +109,12 @@ class HomePage extends StatelessWidget {
         child: Icon(Icons.chat),
       ),
     );
+  }
+
+  void updateMyToken() async {
+    var token = await FCM.generateToken();
+    usersRef.doc(currentUser!.uid).update({
+      "token": token
+    });
   }
 }
