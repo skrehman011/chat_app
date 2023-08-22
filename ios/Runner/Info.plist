@@ -47,5 +47,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>This app (Chat App) needs access to images to send in chat</string>
 </dict>
 </plist>

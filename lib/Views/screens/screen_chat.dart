@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:mondaytest/Models/message_model.dart';
+import 'package:mondaytest/Views/screens/screen_image_view.dart';
 import 'package:mondaytest/controller/chat_controller.dart';
 import 'package:mondaytest/helper/Fcm.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -27,9 +28,11 @@ class ScreenChat extends StatelessWidget {
             receiver.name,
             style: TextStyle(color: Colors.black, fontSize: 18.sp, fontWeight: FontWeight.bold),
           ),
-          subtitle: Obx(() {
-            return Text(formatRelativeTime(chatController.receiverObservable.value?.lastSeen ?? 0));
-          }),
+          subtitle: GetBuilder<ChatController>(
+              init: chatController,
+              builder: (logic) {
+                return Text(formatRelativeTime(chatController.receiverObservable.value?.lastSeen ?? 0));
+              }),
         ),
         centerTitle: false,
         leading: IconButton(
@@ -46,7 +49,7 @@ class ScreenChat extends StatelessWidget {
             children: [
               Expanded(
                   child: StreamBuilder<DatabaseEvent>(
-                      stream: chatsRef.child(getRoomId(receiver.id, currentUser!.uid)).child("messages").onValue,
+                      stream: chatsRef.child(chatController.getRoomId(receiver.id, currentUser!.uid)).child("messages").onValue,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(
@@ -88,11 +91,21 @@ class ScreenChat extends StatelessWidget {
                                             message.sender_id == currentUser!.uid ? Colors.greenAccent.withOpacity(.7) : Colors.grey.withOpacity(.3),
                                       ),
                                       child: ListTile(
-                                        title: Text(message.text),
+                                        title: message.message_type == 'text'
+                                            ? Text(message.text)
+                                            : GestureDetector(
+                                                onTap: () {
+                                                  Get.to(ScreenImageView(url: message.text));
+                                                },
+                                                child: Image.network(
+                                                  message.text,
+                                                ),
+                                              ),
                                         subtitle: Text(message.sender_id == currentUser!.uid ? "You" : receiver.name),
                                         trailing: Column(
                                           mainAxisAlignment: MainAxisAlignment.end,
                                           crossAxisAlignment: CrossAxisAlignment.end,
+                                          mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Text(
                                               DateFormat("hh:mm").format(DateTime.fromMillisecondsSinceEpoch(message.timestamp)),
@@ -143,7 +156,9 @@ class ScreenChat extends StatelessWidget {
                             ),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              chatController.pickImage();
+                            },
                             icon: Icon(Icons.camera_alt),
                             highlightColor: Colors.transparent,
                             // Set highlight color to transparent
@@ -159,31 +174,7 @@ class ScreenChat extends StatelessWidget {
                     splashColor: Colors.transparent,
                     mini: true,
                     onPressed: () async {
-                      if (chatController.textEditingController.text.isNotEmpty) {
-                        FCM.sendMessageSingle(
-                          currentUser!.displayName ?? "New Message",
-                          chatController.textEditingController.text,
-                          receiver.token ?? "",
-                          {},
-                        );
-
-                        var timestamp = DateTime.now().millisecondsSinceEpoch;
-
-                        var message = MessageModel(
-                            id: timestamp.toString(),
-                            text: chatController.textEditingController.text,
-                            sender_id: currentUser!.uid,
-                            timestamp: timestamp,
-                            receiver_id: receiver.id);
-
-                        var roomPath = chatsRef.child(getRoomId(receiver.id, currentUser!.uid));
-
-                        usersRef.doc(currentUser!.uid).collection('inbox').doc(receiver.id).set(message.toMap());
-                        usersRef.doc(receiver.id).collection('inbox').doc(currentUser!.uid).set(message.toMap());
-
-                        roomPath.child("messages").child(timestamp.toString()).set(message.toMap());
-                        chatController.textEditingController.clear();
-                      }
+                      chatController.sendMessage(chatController.textEditingController.text);
                     },
                     child: Icon(
                       Icons.send,
@@ -247,13 +238,6 @@ class ScreenChat extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String getRoomId(String user1, String user2) {
-    var merge = "$user1$user2";
-    var charList = merge.split('');
-    charList.sort((a, b) => a.compareTo(b));
-    return charList.join();
   }
 
   ScreenChat({
