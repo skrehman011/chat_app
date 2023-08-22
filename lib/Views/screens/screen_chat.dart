@@ -2,10 +2,8 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:mondaytest/Models/message_model.dart';
-import 'package:mondaytest/Models/user_model.dart';
 import 'package:mondaytest/helper/Fcm.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 

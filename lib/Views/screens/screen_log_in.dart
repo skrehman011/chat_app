@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
-import 'package:get/get_utils/get_utils.dart';
 import 'package:mondaytest/Views/screens/screen_sign_up.dart';
 import 'package:mondaytest/controller/RegistrationController.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
