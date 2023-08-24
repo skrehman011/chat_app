@@ -249,6 +249,10 @@ class ScreenChat extends StatelessWidget {
     final timestamp = DateTime.fromMillisecondsSinceEpoch(millisecondsSinceEpoch);
     final difference = now.difference(timestamp);
 
+    if (millisecondsSinceEpoch == 0){
+      return 'loading...';
+    }
+
     if (difference.inSeconds <= 10) {
       return "Online";
     }
